@@ -4,6 +4,25 @@ import streamlit as st
 import sqlite3
 from datetime import datetime
 import pandas as pd
+import base64
+
+# -------------------- CUSTOM FONT STYLE --------------------
+def inject_custom_font():
+    font_url = "https://www.kurdfonts.com/uploads/files/2023-11/1700141447_zarif.ttf"
+    font_css = f"""
+        <style>
+        @font-face {{
+            font-family: 'Zarif';
+            src: url('{font_url}') format('truetype');
+        }}
+        html, body, [class^="css"]  {{
+            font-family: 'Zarif', sans-serif;
+        }}
+        </style>
+    """
+    st.markdown(font_css, unsafe_allow_html=True)
+
+inject_custom_font()
 
 # -------------------- DATABASE SETUP --------------------
 DB_NAME = 'scoop_inventory.db'
