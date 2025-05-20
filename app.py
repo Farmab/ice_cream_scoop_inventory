@@ -3,6 +3,7 @@
 import streamlit as st
 import sqlite3
 from datetime import datetime
+import pandas as pd
 
 # -------------------- DATABASE SETUP --------------------
 DB_NAME = 'scoop_inventory.db'
@@ -69,9 +70,11 @@ if st.button("Add Record"):
 st.subheader("📋 All Scoop Records")
 data = get_all_scoops()
 if data:
+    df = pd.DataFrame(data, columns=["ID", "Date", "Branch", "Product Name", "Quantity"])
+    st.dataframe(df.style.set_properties(**{'border': '1px solid black'}), use_container_width=True)
+
     for row in data:
-        st.write(f"📌 {row[1]} | Branch: {row[2]} | Product: {row[3]} | Qty: {row[4]}")
-        if st.button(f"❌ Delete", key=f"delete_{row[0]}"):
+        if st.button(f"❌ Delete ID {row[0]}", key=f"delete_{row[0]}"):
             delete_scoop(row[0])
             st.experimental_rerun()
 else:
