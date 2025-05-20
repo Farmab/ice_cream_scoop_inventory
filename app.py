@@ -6,6 +6,9 @@ from datetime import datetime
 import pandas as pd
 import base64
 
+# -------------------- STREAMLIT CONFIG (MUST BE FIRST) --------------------
+st.set_page_config(page_title="Ice Cream Scoop Inventory", layout="centered")
+
 # -------------------- CUSTOM FONT STYLE --------------------
 def inject_custom_font():
     font_url = "https://www.kurdfonts.com/uploads/files/2023-11/1700141447_zarif.ttf"
@@ -70,7 +73,6 @@ def delete_scoop(record_id):
     conn.close()
 
 # -------------------- STREAMLIT UI --------------------
-st.set_page_config(page_title="Ice Cream Scoop Inventory", layout="centered")
 st.title("🍨 Ice Cream Scoop Inventory")
 
 init_db()
