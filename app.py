@@ -135,10 +135,11 @@ st.subheader("📋 All Scoop Records")
 data = get_all_scoops()
 if data:
     df = pd.DataFrame(data, columns=["ID", "Date", "Branch", "Product Name", "Unit", "Quantity", "Price (IQD)"])
-    df["Total"] = df["Quantity"] * df["Price (IQD)"]
+    df = df.fillna(0)
+    df["Total"] = pd.to_numeric(df["Quantity"], errors='coerce').fillna(0) * pd.to_numeric(df["Price (IQD)"], errors='coerce').fillna(0)
     total_revenue = df["Total"].sum()
 
-    st.markdown(f"### 💰 Total Revenue: {total_revenue:,.0f} IQD")
+    st.markdown(f"### 💰 Total Revenue: {int(total_revenue):,} IQD")
     st.dataframe(df.style.set_properties(**{'border': '1px solid black'}), use_container_width=True)
 
     csv = df.to_csv(index=False).encode('utf-8')
