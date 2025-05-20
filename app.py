@@ -49,6 +49,20 @@ def init_db():
     conn.commit()
     conn.close()
 
+def upgrade_db():
+    conn = sqlite3.connect(DB_NAME)
+    c = conn.cursor()
+    try:
+        c.execute("ALTER TABLE scoops ADD COLUMN unit TEXT")
+    except sqlite3.OperationalError:
+        pass
+    try:
+        c.execute("ALTER TABLE scoops ADD COLUMN price_iqd INTEGER")
+    except sqlite3.OperationalError:
+        pass
+    conn.commit()
+    conn.close()
+
 def insert_scoop(date, branch, product_name, unit, quantity, price_iqd):
     conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
@@ -76,6 +90,7 @@ def delete_scoop(record_id):
 st.title("🍨 Ice Cream Scoop Inventory")
 
 init_db()
+upgrade_db()
 
 # Add new record
 st.subheader("Add Scoop Record")
