@@ -8,6 +8,8 @@ import pandas as pd
 # -------------------- DATABASE SETUP --------------------
 DB_NAME = 'scoop_inventory.db'
 
+DEFAULT_UNITS = ["kg", "litre", "piece", "box", "carton", "rabta", "3alba"]
+
 def init_db():
     conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
@@ -17,17 +19,19 @@ def init_db():
             date TEXT,
             branch TEXT,
             product_name TEXT,
-            quantity INTEGER
+            unit TEXT,
+            quantity INTEGER,
+            price_iqd INTEGER
         )
     ''')
     conn.commit()
     conn.close()
 
-def insert_scoop(date, branch, product_name, quantity):
+def insert_scoop(date, branch, product_name, unit, quantity, price_iqd):
     conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
-    c.execute("INSERT INTO scoops (date, branch, product_name, quantity) VALUES (?, ?, ?, ?)",
-              (date, branch, product_name, quantity))
+    c.execute("INSERT INTO scoops (date, branch, product_name, unit, quantity, price_iqd) VALUES (?, ?, ?, ?, ?, ?)",
+              (date, branch, product_name, unit, quantity, price_iqd))
     conn.commit()
     conn.close()
 
@@ -57,20 +61,31 @@ st.subheader("Add Scoop Record")
 date = st.date_input("Date", datetime.now())
 branch = st.selectbox("Branch", ["Main", "Masif", "Downtown", "Other"])
 product = st.text_input("Product Name")
+
+# Select or add unit
+unit_options = DEFAULT_UNITS.copy()
+selected_unit = st.selectbox("Select Unit", unit_options + ["Other"])
+if selected_unit == "Other":
+    new_unit = st.text_input("Enter new unit")
+    unit = new_unit if new_unit else ""
+else:
+    unit = selected_unit
+
 quantity = st.number_input("Quantity", min_value=1, step=1)
+price_iqd = st.number_input("Price (IQD)", min_value=0, step=100)
 
 if st.button("Add Record"):
-    if product:
-        insert_scoop(str(date), branch, product, quantity)
+    if product and unit:
+        insert_scoop(str(date), branch, product, unit, quantity, price_iqd)
         st.success("✅ Record added successfully")
     else:
-        st.error("❌ Please enter a product name")
+        st.error("❌ Please enter all product details")
 
 # View all records
 st.subheader("📋 All Scoop Records")
 data = get_all_scoops()
 if data:
-    df = pd.DataFrame(data, columns=["ID", "Date", "Branch", "Product Name", "Quantity"])
+    df = pd.DataFrame(data, columns=["ID", "Date", "Branch", "Product Name", "Unit", "Quantity", "Price (IQD)"])
     st.dataframe(df.style.set_properties(**{'border': '1px solid black'}), use_container_width=True)
 
     for row in data:
